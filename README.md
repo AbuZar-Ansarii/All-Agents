@@ -1,58 +1,65 @@
 # 🤖 Termux AI Agent Suite
 
-A collection of optimized, professional installer scripts to run state-of-the-art autonomous AI agents natively or virtualized on Android devices using **Termux**.
+A collection of optimized, professional installer configurations to run state-of-the-art autonomous AI agents natively or virtualized on Android devices using **Termux**.
 
 ---
 
 ## 📊 Agent Comparison Matrix
 
-| Agent | Environment | Installation Type | Quick Install Command |
+| Agent | Environment | Installation Type | Key Focus & Characteristics |
 | :--- | :--- | :--- | :--- |
-| **🦞 OpenClaw** | Termux (Native) | Node.js (Standalone) | `curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/openclaw_install.sh \| bash` |
-| **⚕ Hermes** | PRoot (Ubuntu) | Python/Venv + Node.js | `curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/hermes_install.sh \| bash` |
-| **🧠 OpenClaude** | Termux (Native) | Vanilla Shell Script | `curl -sL "https://raw.githubusercontent.com/AbuZar-Ansarii/free-openclaude/master/vanila_install.sh" \| bash` |
+| **🦞 OpenClaw** | Termux (Native) | Node.js (Standalone) | Local-first personal AI assistant gateway connecting chats (WhatsApp, Telegram, etc.) directly to AI models. |
+| **⚕ Hermes** | PRoot (Ubuntu) | Python/Venv + Node.js | Persistent, self-improving AI agent that saves workflows as reusable "skills" and learns over time. |
+| **🧠 OpenClaude** | Termux (Native) | Vanilla Shell Script | Lightweight, autonomous terminal coder and assistant running natively without container overhead. |
+
+---
+
+## ✨ Suite Features
+
+*   **Hybrid Execution Models:** Run lightweight scripts directly inside Termux or opt for a full glibc-compliant virtualized Ubuntu container when standard library compatibility is required.
+*   **Persistent Services:** Built-in Wake-Lock management ensures background messaging gateways (WhatsApp, Telegram, Discord) remain online 24/7.
+*   **Web Dashboard Access:** Direct support for routing visual control dashboards to local ports (e.g., port 18789) for interactive browser configurations.
+*   **Native Build Configuration:** Automatic configuration of C++ compilation toolchains (`clang`, `make`, `binutils`) to support compiling native modules on Android.
 
 ---
 
 ## 🦞 1. OpenClaw Agent (Native Termux)
 
-**OpenClaw** is a local-first personal AI assistant gateway that connects multiple messaging interfaces (WhatsApp, Telegram, Discord, etc.) directly to your AI models.
+OpenClaw connects your messaging accounts to AI models to automate tasks using native Node.js environments.
 
 ### 🚀 Installation
 ```bash
 curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/openclaw_install.sh | bash
 ```
 
-### ⚙️ Command Directory
-Run these commands directly in your Termux command line:
-*   `openclaw onboard` — Start the interactive model configuration setup.
-*   `openclaw gateway` — Boot up the background chat connectors.
-*   `openclaw doctor` — Run diagnostics to check configs and credentials.
-*   **Web Console:** Accessible at `http://127.0.0.1:18789` once the gateway is active.
+### ⚙️ Quick Reference Commands
+*   `openclaw onboard` (or `openclaw-setup`) — Run the onboarding setup wizard.
+*   `openclaw gateway` (or `openclaw-start`) — Start the messaging gateway.
+*   `openclaw doctor` (or `openclaw-doctor`) — Run system diagnostics.
+*   **Visual Control UI:** Open `http://127.0.0.1:18789` in your phone's browser while the gateway is active.
 
 ---
 
 ## ⚕ 2. Hermes Agent (PRoot Ubuntu)
 
-**Hermes** is a persistent, self-improving AI agent developed by Nous Research. Because of Python wheel compilation requirements and Playwright Chromium control interfaces on Android, it runs inside an Ubuntu container via `proot-distro` for maximum compatibility.
+Hermes is a persistent agent that creates its own skills. It uses an Ubuntu container via `proot-distro` to ensure compatibility with Python libraries (`psutil`) and Playwright browser control.
 
 ### 🚀 Installation
 ```bash
 curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/hermes_install.sh | bash
 ```
 
-### ⚙️ Command Directory
-The installer adds wrapper binaries to Termux so you can execute these transparently:
-*   `hermes-setup` — Run the model config setup wizard.
+### ⚙️ Quick Reference Commands
+*   `hermes-setup` — Initialize LLM models and API credentials.
 *   `hermes-start` — Open the terminal console interface (TUI).
-*   `hermes-gateway` — Run the messaging bot connector.
-*   `hermes <command>` — Direct CLI access.
+*   `hermes-gateway` — Run the background bot connector.
+*   `hermes <command>` — Directly run CLI tools.
 
 ---
 
 ## 🧠 3. OpenClaude Agent (Native / Vanilla)
 
-**OpenClaude** is an autonomous terminal agent workspace designed to interact natively with your environment using optimized vanilla shell installers.
+OpenClaude is an autonomous developer workspace running natively on your phone via vanilla shell installations.
 
 ### 🚀 Installation
 ```bash
@@ -61,24 +68,36 @@ curl -sL "https://raw.githubusercontent.com/AbuZar-Ansarii/free-openclaude/maste
 
 ---
 
-## 🔋 Crucial Background Execution Guard
+## 📋 Prerequisites
 
-Android OS aggressively stops background apps like Termux to preserve battery. To prevent your AI gateways from going offline:
-
-1. **Enable Wake Lock:** Keep the CPU awake. The installers run `termux-wake-lock` automatically. Ensure you keep the Termux background notification active in your notification drawer.
-2. **Disable Battery Optimization:**
-   - Go to your Android **Settings** -> **Apps** -> **Termux**.
-   - Tap **Battery** or **Battery Saver**.
-   - Change the setting to **Unrestricted** (or turn off battery optimization).
+Before installing any agent, ensure your environment meets the following conditions:
+*   **Official Termux App:** Do not use the deprecated version from the Google Play Store. You must install the modern build from [F-Droid](https://f-droid.org/packages/com.termux/) or the [Termux GitHub Releases](https://github.com/termux/termux-app).
+*   **Active Internet Connection:** Stable connection is required to fetch compiler tools, Node packages, or container images.
+*   **LLM API Keys:** You will need API credentials (e.g., Gemini, OpenRouter, Anthropic, or OpenAI keys) to authorize model requests during onboarding.
 
 ---
 
-## ⚙️ Push Updates to GitHub
+## 🔋 Android Background Optimization
 
-To sync changes made on your workstation back to your remote repository, run:
+To prevent Android's battery manager from terminating your active agent processes in the background:
 
-```bash
-git add openclaw_install.sh hermes_install.sh README.md
-git commit -m "Update and refine installer suite README"
-git push origin main
-```
+1. **Acquire Wake Lock:** Keep the CPU awake. The wrapper scripts automatically trigger `termux-wake-lock`. Ensure you do not close the persistent Termux notification in your status bar.
+2. **Disable Battery Optimization:**
+   - Open Android **Settings** -> **Apps** -> **Termux**.
+   - Tap **Battery** or **Battery Saver**.
+   - Change the setting to **Unrestricted** (or turn off battery optimization/restrictions).
+
+---
+
+## 🛠️ Troubleshooting
+
+### 1. Mirror Connection / Package Locating Errors
+If packages fail to install or update:
+*   Run `termux-change-repo` in Termux.
+*   Select **Main Repository** and switch your mirror to a reputable host (e.g., **Mirror by Grimler** or **Cloudflare**).
+*   Run `pkg update -y` and retry the installer.
+
+### 2. DNS / Network Timeout Failures
+If Node.js throws network timeout or hostname resolution errors:
+*   Ensure the DNS fix is loaded by running `source ~/.bashrc`.
+*   Verify that `NODE_OPTIONS` environment variable is active: `echo $NODE_OPTIONS` (should output `--dns-result-order=ipv4first`).
