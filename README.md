@@ -1,77 +1,73 @@
-# Hermes Termux Ubuntu-PRoot Installer
+# All-Agents Termux Installers
 
-This repository contains a professional wrapper installer (`hermes_install.sh`) to run **[Nous Research's Hermes Agent](https://github.com/NousResearch/hermes-agent)** on Android inside a native **Ubuntu glibc container** using Termux and `proot-distro`.
+This repository contains professional environment preparers and installers to run top-tier autonomous AI agents on Android using **Termux**.
 
-Running Hermes inside a standard Ubuntu environment solves common compilation issues, library incompatibilities, and browser control socket limitations on Android (such as Playwright Chromium and SQLite issues). It provides a standard, robust execution environment while keeping it completely transparent to use.
+It provides installation wrapper scripts for:
+1. **[Hermes Agent](https://github.com/NousResearch/hermes-agent)** (Ubuntu PRoot method) — solves Bionic libc compilation errors by running inside a standard Ubuntu environment.
+2. **[OpenClaw Agent](https://github.com/openclaw/openclaw)** (Native Termux method) — runs directly on the device using Node.js LTS and compiler toolchains.
 
 ---
 
-## 🚀 One-Line Installation
+## 🦞 1. OpenClaw Installer (Native Termux)
 
-Open the **Termux** app on your Android device and execute the following command:
+**OpenClaw** is a local-first personal AI assistant gateway that connects messaging apps (WhatsApp, Telegram, Discord, etc.) to AI models. It runs natively in Termux using Node.js.
+
+### 🚀 One-Line Installation
+
+Open the **Termux** app on your Android device and run:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/openclaw_install.sh | bash
+```
+
+### 🎮 How to Control OpenClaw
+Once installed, the following commands are configured directly in your Termux shell:
+*   `openclaw onboard` (or `openclaw-setup`) — Run the interactive wizard to set up LLM providers (Gemini, OpenAI, etc.) and messaging credentials.
+*   `openclaw gateway` (or `openclaw-start`) — Run the background messaging connector.
+*   `openclaw doctor` (or `openclaw-doctor`) — Runs verification and diagnostics check.
+*   **Web Dashboard:** Accessible on your device at `http://127.0.0.1:18789` once the gateway is running.
+
+---
+
+## ⚕ 2. Hermes Agent Installer (Ubuntu PRoot)
+
+**Hermes Agent** is a persistent, self-improving AI agent developed by Nous Research. Because of Bionic libc incompatibilities and Playwright Chromium requirements, it is installed inside a standard Ubuntu environment virtualized via `proot-distro`.
+
+### 🚀 One-Line Installation
+
+Open the **Termux** app on your Android device and run:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/hermes_install.sh | bash
 ```
 
-### Passing Options to the Installer
+### 🎮 How to Control Hermes
+Commands run transparently inside the Ubuntu container:
+*   `hermes-setup` — Run the model config setup wizard.
+*   `hermes-start` — Open the terminal console interface (TUI).
+*   `hermes-gateway` — Run the messaging bot connector.
+*   `hermes <command>` — Direct CLI access.
 
-Any command-line options you pass to this wrapper will automatically be forwarded to the official installer running inside the Ubuntu container:
+---
+
+## 🔋 Crucial Settings for Background Execution
+
+Android's battery manager will kill background services like Termux. To ensure your AI agents stay online:
+
+1. **Acquire Wake Lock:** Both installers automatically invoke `termux-wake-lock`. Make sure a persistent Termux notification remains in your status drawer.
+2. **Battery Optimization:**
+   - Go to Android **Settings** -> **Apps** -> **Termux**.
+   - Tap **Battery** or **Battery Saver**.
+   - Set to **Unrestricted** / **No restrictions**.
+
+---
+
+## ⚙️ Push Updates to GitHub
+
+To sync these scripts and documentation with your remote repository, run:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/hermes_install.sh | bash -s -- --skip-setup --branch main
+git add openclaw_install.sh hermes_install.sh README.md
+git commit -m "Add OpenClaw native Termux installer and update unified README"
+git push origin main
 ```
-
----
-
-## ⚙️ How It Works (Behind the Scenes)
-
-1. **Termux Environment Prep:** Updates Termux package repositories, and installs `proot-distro` and native utilities (`curl`, `git`).
-2. **Ubuntu Environment Setup:** Downloads, installs, and starts a standard Ubuntu image using `proot-distro`.
-3. **Ubuntu Bootstrapping:** Installs compilation headers and packages (`python3-venv`, `python3-pip`, `build-essential`, `curl`, `git`, `dbus`, etc.) inside the container.
-4. **Official Hermes Installation:** Runs the official Hermes installer inside the virtualized Ubuntu environment. It installs `uv`, configures virtual environments, and installs package dependencies natively.
-5. **Termux Wrapper Commands:** Generates wrapper scripts under Termux's `$PREFIX/bin` to allow executing Hermes commands directly from Termux.
-
----
-
-## 🎮 How to Control the Agent from Termux
-
-The installer configures commands that execute transparently inside the Ubuntu container. You can run them directly in your Termux shell:
-
-*   `hermes` - Access the Hermes CLI.
-*   `hermes-setup` - Run the configuration wizard (API keys, model configuration).
-*   `hermes-start` - Start the interactive terminal dashboard (TUI).
-*   `hermes-gateway` - Run the background bot integration (Telegram, Slack, Discord, WhatsApp).
-
----
-
-## 📁 Accessing Config & Data Files
-
-Although Hermes runs inside the Ubuntu container, all its files are stored on your device and can be accessed or edited directly from Termux.
-
-The root home directory of the Ubuntu container is located at:
-```
-/data/data/com.termux/files/usr/var/lib/proot-distro/installed-rootfs/ubuntu/root
-```
-
-This means your Hermes configuration folders live at:
-*   **API Keys / Environment:** `/data/data/com.termux/files/usr/var/lib/proot-distro/installed-rootfs/ubuntu/root/.hermes/.env`
-*   **YAML Config:** `/data/data/com.termux/files/usr/var/lib/proot-distro/installed-rootfs/ubuntu/root/.hermes/config.yaml`
-*   **Custom Skills / Memory:** `/data/data/com.termux/files/usr/var/lib/proot-distro/installed-rootfs/ubuntu/root/.hermes/`
-
-For example, to configure your API keys from Termux, simply run:
-```bash
-nano /data/data/com.termux/files/usr/var/lib/proot-distro/installed-rootfs/ubuntu/root/.hermes/.env
-```
-
----
-
-## 🔋 Preventing Android from Killing the Agent
-
-Android's background execution limits can terminate background processes like Termux. To prevent this:
-
-1. **Acquire Wake Lock:** The installer automatically calls `termux-wake-lock`. You will see a persistent notification saying Termux is running in the background. Do not close this notification.
-2. **Disable Battery Optimization:**
-   - Go to your Android device **Settings** -> **Apps** -> **Termux**.
-   - Tap on **Battery** or **Battery Saver**.
-   - Set it to **Unrestricted** / **No restrictions**.
