@@ -34,10 +34,10 @@ curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/open
 ```
 
 ### ⚙️ Quick Reference Commands
-*   `openclaw onboard` (or `openclaw-setup`) — Run the onboarding setup wizard.
-*   `openclaw gateway` (or `openclaw-start`) — Start the messaging gateway.
-*   `openclaw doctor` (or `openclaw-doctor`) — Run system diagnostics.
-*   **Visual Control UI:** Open `http://127.0.0.1:18789` in your phone's browser while the gateway is active.
+*   **Onboarding:** `openclaw onboard` (or `openclaw-setup`)
+*   **Start gateway:** `openclaw gateway` (or `openclaw-start`)
+*   **Get gateway token:** `cat ~/.openclaw/openclaw.json`
+*   **Openclaw dashboard:** `http://127.0.0.1:18789`
 
 ---
 
