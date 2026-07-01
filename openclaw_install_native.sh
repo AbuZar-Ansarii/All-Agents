@@ -30,10 +30,19 @@ pkg update -y -o Dpkg::Options::="--force-confold" -o Dpkg::Options::="--force-c
     echo "⚠️  pkg update had warnings (continuing...)"
 }
 
+# Pre-install glibc-repo and glibc-runner to bypass remote Pacman bugs
+echo "📦 Installing glibc-repo and glibc-runner compatibility layers..."
+pkg install -y glibc-repo glibc-runner </dev/null 2>&1 || {
+    echo "⚠️  Failed to pre-install glibc-runner via pkg, trying to continue..."
+}
+
 # Install core dependencies for OpenClaw
 pkg install -y curl nodejs git cmake make clang binutils openssl which </dev/null 2>&1 || {
     echo "⚠️  Some packages may have failed to install, checking essentials..."
 }
+
+# Refresh shell command hashing
+hash -r
 
 # Verify essentials
 MISSING=""
