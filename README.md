@@ -1,20 +1,22 @@
-# Hermes Termux Installer
+# Hermes Termux Ubuntu-PRoot Installer
 
-This repository contains a professional wrapper script (`hermes_install.sh`) to install **[Nous Research's Hermes Agent](https://github.com/NousResearch/hermes-agent)** on Android using the **Termux** app.
+This repository contains a professional wrapper installer (`hermes_install.sh`) to run **[Nous Research's Hermes Agent](https://github.com/NousResearch/hermes-agent)** on Android inside a native **Ubuntu glibc container** using Termux and `proot-distro`.
 
-It automatically handles the installation of required compiler toolchains (clang, rust, make, etc.), retrieves Android storage permissions, handles background execution settings (Wake Lock), and runs the official installer cleanly.
+Running Hermes inside a standard Ubuntu environment solves common compilation issues, library incompatibilities, and browser control socket limitations on Android (such as Playwright Chromium and SQLite issues). It provides a standard, robust execution environment while keeping it completely transparent to use.
+
+---
 
 ## 🚀 One-Line Installation
 
-Once you push this repository to GitHub, open the **Termux** app on your Android device and run the following command:
+Open the **Termux** app on your Android device and execute the following command:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/hermes_install.sh | bash
 ```
 
-### Passing Installer Options
+### Passing Options to the Installer
 
-You can also pass arguments down to the official installer (for example, to skip the setup wizard or download specific branches):
+Any command-line options you pass to this wrapper will automatically be forwarded to the official installer running inside the Ubuntu container:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/hermes_install.sh | bash -s -- --skip-setup --branch main
@@ -22,45 +24,54 @@ curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/herm
 
 ---
 
-## 🛠️ What the Installer Does
+## ⚙️ How It Works (Behind the Scenes)
 
-1. **System & Environment Checks:** Verifies that the environment is Termux and handles fallback prompts.
-2. **Repository Mirror Optimization:** Runs `pkg update` and automatically manages Termux mirror fallbacks.
-3. **Android Storage & Wake Lock Access:** Prompts for Android Storage permission and runs `termux-wake-lock` to keep the Hermes background process alive.
-4. **Pre-installs Native Toolchains:** Headlessly installs compilation dependencies (`clang`, `rust`, `make`, `pkg-config`, `libffi`, `openssl`, `git`, `python`, `nodejs`, `ffmpeg`, `ripgrep`) to ensure the compilation of Python modules (such as `psutil` or cryptography packages) runs smoothly.
-5. **Invokes Official Installer:** Fetches and runs the official `install.sh` from Nous Research.
-6. **Convenience Shell Aliases:** Appends shortcuts to your `~/.bashrc` (or `~/.zshrc`):
-   - `hermes-start`: Launches the TUI (`hermes tui`).
-   - `hermes-gateway`: Runs the background messenger gateway (useful if using WhatsApp/Telegram/Discord).
-   - `hermes-setup`: Re-runs the configuration setup wizard.
+1. **Termux Environment Prep:** Updates Termux package repositories, and installs `proot-distro` and native utilities (`curl`, `git`).
+2. **Ubuntu Environment Setup:** Downloads, installs, and starts a standard Ubuntu image using `proot-distro`.
+3. **Ubuntu Bootstrapping:** Installs compilation headers and packages (`python3-venv`, `python3-pip`, `build-essential`, `curl`, `git`, `dbus`, etc.) inside the container.
+4. **Official Hermes Installation:** Runs the official Hermes installer inside the virtualized Ubuntu environment. It installs `uv`, configures virtual environments, and installs package dependencies natively.
+5. **Termux Wrapper Commands:** Generates wrapper scripts under Termux's `$PREFIX/bin` to allow executing Hermes commands directly from Termux.
 
 ---
 
-## 🔋 Keeping the Agent Running in the Background
+## 🎮 How to Control the Agent from Termux
 
-Android is very aggressive with battery management and will kill background applications like Termux. To prevent this:
+The installer configures commands that execute transparently inside the Ubuntu container. You can run them directly in your Termux shell:
 
-1. **Enable Wake Lock:** The installer automatically attempts to do this, but make sure to accept any notification permissions Termux asks for.
-2. **Disable Battery Optimization:** 
+*   `hermes` - Access the Hermes CLI.
+*   `hermes-setup` - Run the configuration wizard (API keys, model configuration).
+*   `hermes-start` - Start the interactive terminal dashboard (TUI).
+*   `hermes-gateway` - Run the background bot integration (Telegram, Slack, Discord, WhatsApp).
+
+---
+
+## 📁 Accessing Config & Data Files
+
+Although Hermes runs inside the Ubuntu container, all its files are stored on your device and can be accessed or edited directly from Termux.
+
+The root home directory of the Ubuntu container is located at:
+```
+/data/data/com.termux/files/usr/var/lib/proot-distro/installed-rootfs/ubuntu/root
+```
+
+This means your Hermes configuration folders live at:
+*   **API Keys / Environment:** `/data/data/com.termux/files/usr/var/lib/proot-distro/installed-rootfs/ubuntu/root/.hermes/.env`
+*   **YAML Config:** `/data/data/com.termux/files/usr/var/lib/proot-distro/installed-rootfs/ubuntu/root/.hermes/config.yaml`
+*   **Custom Skills / Memory:** `/data/data/com.termux/files/usr/var/lib/proot-distro/installed-rootfs/ubuntu/root/.hermes/`
+
+For example, to configure your API keys from Termux, simply run:
+```bash
+nano /data/data/com.termux/files/usr/var/lib/proot-distro/installed-rootfs/ubuntu/root/.hermes/.env
+```
+
+---
+
+## 🔋 Preventing Android from Killing the Agent
+
+Android's background execution limits can terminate background processes like Termux. To prevent this:
+
+1. **Acquire Wake Lock:** The installer automatically calls `termux-wake-lock`. You will see a persistent notification saying Termux is running in the background. Do not close this notification.
+2. **Disable Battery Optimization:**
    - Go to your Android device **Settings** -> **Apps** -> **Termux**.
    - Tap on **Battery** or **Battery Saver**.
-   - Change the setting to **Unrestricted** (or turn off battery optimization).
-
----
-
-## ⚙️ How to Push this Repository to GitHub
-
-If you haven't pushed this folder to GitHub yet, run these commands in your workstation's terminal:
-
-```bash
-# 1. Initialize git and commit changes
-git add hermes_install.sh README.md
-git commit -m "Add Hermes Termux Installer and README"
-
-# 2. Rename default branch to main (if not already done)
-git branch -M main
-
-# 3. Add your remote repository and push (replace with your repo URL)
-git remote add origin https://github.com/AbuZar-Ansarii/All-Agents.git
-git push -u origin main
-```
+   - Set it to **Unrestricted** / **No restrictions**.
