@@ -46,7 +46,8 @@ echo -e "     - Virtualizes an Ubuntu glibc container inside Termux."
 echo -e "     - Resolves all SQLite, Python build, and Playwright browser errors."
 echo -e "     - Requires about 1.5 GB of free disk space."
 echo ""
-read -r -p "Enter your choice [1 or 2]: " choice
+read -r -p "Enter your choice [1 or 2] (Default: 1 - Native): " choice
+choice="${choice:-1}"
 
 case "$choice" in
     1)

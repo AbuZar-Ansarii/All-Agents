@@ -45,22 +45,10 @@ curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/open
 
 Hermes is a persistent agent that creates its own skills. You can install it natively or inside a virtualized Ubuntu container depending on your compatibility requirements.
 
-### 🚀 Installation (Interactive Selector)
-You can run the interactive selector to choose between Native and PRoot methods on the fly:
+### 🚀 Installation
+Run this single interactive script to select between the Native (default) and PRoot Ubuntu installation methods:
 ```bash
 curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/hermes_install.sh | bash
-```
-
-### 🏎️ Method 1: Native Installation (Direct)
-Use this command to install directly into native Termux (lightweight, uses fewer resources):
-```bash
-curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/hermes_install_native.sh | bash
-```
-
-### 🐳 Method 2: PRoot Ubuntu Installation (Direct)
-Use this command to install inside a virtualized Ubuntu glibc container (resolves SQLite compilation and Playwright browser control dependencies):
-```bash
-curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/hermes_install_proot.sh | bash
 ```
 
 ### ⚙️ Quick Reference Commands
