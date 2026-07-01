@@ -102,9 +102,11 @@ install_ubuntu_container() {
     log_info "Checking if Ubuntu proot container is installed..."
     
     local is_installed=0
-    if [ -d "$PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu" ]; then
+    local termux_prefix="${PREFIX:-/data/data/com.termux/files/usr}"
+    
+    if [ -d "$termux_prefix/var/lib/proot-distro/installed-rootfs/ubuntu" ]; then
         is_installed=1
-    elif proot-distro list 2>/dev/null | grep -i "ubuntu" | grep -i "installed" >/dev/null 2>&1; then
+    elif proot-distro login ubuntu -- bash -c "true" >/dev/null 2>&1; then
         is_installed=1
     fi
 
