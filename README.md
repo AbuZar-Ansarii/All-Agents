@@ -8,7 +8,8 @@ A collection of optimized, professional installer configurations to run state-of
 
 | Agent | Environment | Installation Type | Key Focus & Characteristics |
 | :--- | :--- | :--- | :--- |
-| **🦞 OpenClaw** | Termux (Native) | Node.js (Standalone) | Local-first personal AI assistant gateway connecting chats (WhatsApp, Telegram, etc.) directly to AI models. |
+| **🦞 OpenClaw (Native)** | Termux (Native) | Node.js (Standalone) | Local-first personal AI assistant gateway connecting chats (WhatsApp, etc.) natively inside Termux. |
+| **🦞 OpenClaw (PRoot)** | PRoot (Ubuntu) | Node.js (Global) | Virtualized Ubuntu version of OpenClaw that bypasses glibc dynamic linker and runner loader errors. |
 | **⚕ Hermes (Native)** | Termux (Native) | Python/Venv + Node.js | Lightweight native Termux version of the persistent self-learning agent (runs directly on device CPU). |
 | **⚕ Hermes (PRoot)** | PRoot (Ubuntu) | Python/Venv + Node.js | Virtualized Ubuntu version of Hermes solving native Bionic libc compilation and browser control socket errors. |
 | **🧠 OpenClaude** | Termux (Native) | Vanilla Shell Script | Lightweight, autonomous terminal coder and assistant running natively without container overhead. |
@@ -33,11 +34,12 @@ Before installing any agent, ensure your environment meets the following conditi
 
 ---
 
-## 🦞 1. OpenClaw Agent (Native Termux)
+## 🦞 1. OpenClaw Agent (Dual Methods)
 
-OpenClaw connects your messaging accounts to AI models to automate tasks using native Node.js environments.
+OpenClaw connects your messaging accounts to AI models to automate tasks using Node.js environments.
 
-### 🚀 Installation
+### 🚀 Installation (Interactive Selector)
+Run this single interactive script to select between the Native (default) and PRoot Ubuntu installation methods:
 ```bash
 curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/openclaw_install.sh | bash
 ```
@@ -45,7 +47,9 @@ curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/open
 ### ⚙️ Quick Reference Commands
 *   **Onboarding:** `openclaw onboard` (or `openclaw-setup`)
 *   **Start gateway:** `openclaw gateway` (or `openclaw-start`)
-*   **Get gateway token:** `cat ~/.openclaw/openclaw.json`
+*   **Get gateway token:** 
+    *   *For Native:* `cat ~/.openclaw/openclaw.json`
+    *   *For PRoot:* `cat /data/data/com.termux/files/usr/var/lib/proot-distro/installed-rootfs/ubuntu/root/.openclaw/openclaw.json`
 *   **Openclaw dashboard:** `http://127.0.0.1:18789`
 
 ---
@@ -54,7 +58,7 @@ curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/open
 
 Hermes is a persistent agent that creates its own skills. You can install it natively or inside a virtualized Ubuntu container depending on your compatibility requirements.
 
-### 🚀 Installation
+### 🚀 Installation (Interactive Selector)
 Run this single interactive script to select between the Native (default) and PRoot Ubuntu installation methods:
 ```bash
 curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/hermes_install.sh | bash
