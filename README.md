@@ -8,8 +8,7 @@ A collection of optimized, professional installer configurations to run state-of
 
 | Agent | Environment | Installation Type | Key Focus & Characteristics |
 | :--- | :--- | :--- | :--- |
-| **🦞 OpenClaw (Native)** | Termux (Native) | Node.js (Standalone) | Local-first personal AI assistant gateway connecting chats (WhatsApp, etc.) natively inside Termux. |
-| **🦞 OpenClaw (PRoot)** | PRoot (Ubuntu) | Node.js (Global) | Virtualized Ubuntu version of OpenClaw that bypasses glibc dynamic linker and runner loader errors. |
+| **🦞 OpenClaw** | PRoot (Ubuntu) | Node.js (Global) | Local-first personal AI assistant gateway connecting chats (WhatsApp, etc.) inside a stable glibc Ubuntu environment. |
 | **⚕ Hermes (Native)** | Termux (Native) | Python/Venv + Node.js | Lightweight native Termux version of the persistent self-learning agent (runs directly on device CPU). |
 | **⚕ Hermes (PRoot)** | PRoot (Ubuntu) | Python/Venv + Node.js | Virtualized Ubuntu version of Hermes solving native Bionic libc compilation and browser control socket errors. |
 | **🧠 OpenClaude** | Termux (Native) | Vanilla Shell Script | Lightweight, autonomous terminal coder and assistant running natively without container overhead. |
@@ -34,12 +33,11 @@ Before installing any agent, ensure your environment meets the following conditi
 
 ---
 
-## 🦞 1. OpenClaw Agent (Dual Methods)
+## 🦞 1. OpenClaw Agent (Ubuntu PRoot)
 
-OpenClaw connects your messaging accounts to AI models to automate tasks using Node.js environments.
+OpenClaw connects your messaging accounts to AI models to automate tasks using a stable Node.js environment inside a virtualized Ubuntu container (which bypasses Bionic libc and glibc dynamic linker/runner errors).
 
-### 🚀 Installation (Interactive Selector)
-Run this single interactive script to select between the Native (default) and PRoot Ubuntu installation methods:
+### 🚀 Installation
 ```bash
 curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/openclaw_install.sh | bash
 ```
@@ -47,9 +45,7 @@ curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/open
 ### ⚙️ Quick Reference Commands
 *   **Onboarding:** `openclaw onboard` (or `openclaw-setup`)
 *   **Start gateway:** `openclaw gateway` (or `openclaw-start`)
-*   **Get gateway token:** 
-    *   *For Native:* `cat ~/.openclaw/openclaw.json`
-    *   *For PRoot:* `cat /data/data/com.termux/files/usr/var/lib/proot-distro/installed-rootfs/ubuntu/root/.openclaw/openclaw.json`
+*   **Get gateway token:** `openclaw-token` *(Prints your gateway authorization token)*
 *   **Openclaw dashboard:** `http://127.0.0.1:18789`
 
 ---
