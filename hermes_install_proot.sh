@@ -114,7 +114,14 @@ setup_android_integration() {
 install_ubuntu_container() {
     log_info "Checking if Ubuntu proot container is installed..."
     
-    if proot-distro list | grep -q "ubuntu.*installed"; then
+    local is_installed=0
+    if [ -d "$PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu" ]; then
+        is_installed=1
+    elif proot-distro list 2>/dev/null | grep -i "ubuntu" | grep -i "installed" >/dev/null 2>&1; then
+        is_installed=1
+    fi
+
+    if [ "$is_installed" -eq 1 ]; then
         log_success "Ubuntu container is already installed."
     else
         log_info "Installing Ubuntu proot container (this may take a few minutes depending on connection speed)..."
