@@ -24,6 +24,15 @@ A collection of optimized, professional installer configurations to run state-of
 
 ---
 
+## 📋 Prerequisites
+
+Before installing any agent, ensure your environment meets the following conditions:
+*   **Official Termux App:** Do not use the deprecated version from the Google Play Store. You must install the modern build from [F-Droid](https://f-droid.org/packages/com.termux/) or the [Termux GitHub Releases](https://github.com/termux/termux-app).
+*   **Active Internet Connection:** Stable connection is required to fetch compiler tools, Node packages, or container images.
+*   **LLM API Keys:** You will need API credentials (e.g., Gemini, OpenRouter, Anthropic, or OpenAI keys) to authorize model requests during onboarding.
+
+---
+
 ## 🦞 1. OpenClaw Agent (Native Termux)
 
 OpenClaw connects your messaging accounts to AI models to automate tasks using native Node.js environments.
@@ -67,15 +76,6 @@ OpenClaude is an autonomous developer workspace running natively on your phone v
 ```bash
 curl -sL "https://raw.githubusercontent.com/AbuZar-Ansarii/free-openclaude/master/vanila_install.sh" | bash
 ```
-
----
-
-## 📋 Prerequisites
-
-Before installing any agent, ensure your environment meets the following conditions:
-*   **Official Termux App:** Do not use the deprecated version from the Google Play Store. You must install the modern build from [F-Droid](https://f-droid.org/packages/com.termux/) or the [Termux GitHub Releases](https://github.com/termux/termux-app).
-*   **Active Internet Connection:** Stable connection is required to fetch compiler tools, Node packages, or container images.
-*   **LLM API Keys:** You will need API credentials (e.g., Gemini, OpenRouter, Anthropic, or OpenAI keys) to authorize model requests during onboarding.
 
 ---
 
