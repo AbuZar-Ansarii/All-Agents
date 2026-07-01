@@ -2,6 +2,8 @@
 # =========================================================================
 # 🤖 OpenClaw Standalone Installer (No Shizuku) - Native Termux
 # =========================================================================
+#                        THEVOIDKERNEL
+# =========================================================================
 # Designed to run via: curl -sL <url> | bash
 # This version removes all Shizuku-specific phone control dependencies.
 # =========================================================================
