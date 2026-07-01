@@ -6,10 +6,10 @@ It automatically handles the installation of required compiler toolchains (clang
 
 ## 🚀 One-Line Installation
 
-Once you push this repository to GitHub, open the **Termux** app on your Android device and run the following command (replace `<username>` and `<repo>` with your actual GitHub username and repository name):
+Once you push this repository to GitHub, open the **Termux** app on your Android device and run the following command:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/<username>/<repo>/main/hermes_install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/hermes_install.sh | bash
 ```
 
 ### Passing Installer Options
@@ -17,7 +17,7 @@ curl -fsSL https://raw.githubusercontent.com/<username>/<repo>/main/hermes_insta
 You can also pass arguments down to the official installer (for example, to skip the setup wizard or download specific branches):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/<username>/<repo>/main/hermes_install.sh | bash -s -- --skip-setup --branch main
+curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/hermes_install.sh | bash -s -- --skip-setup --branch main
 ```
 
 ---
@@ -61,6 +61,6 @@ git commit -m "Add Hermes Termux Installer and README"
 git branch -M main
 
 # 3. Add your remote repository and push (replace with your repo URL)
-git remote add origin https://github.com/<username>/<repo>.git
+git remote add origin https://github.com/AbuZar-Ansarii/All-Agents.git
 git push -u origin main
 ```
