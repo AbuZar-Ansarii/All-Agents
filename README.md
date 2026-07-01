@@ -9,7 +9,8 @@ A collection of optimized, professional installer configurations to run state-of
 | Agent | Environment | Installation Type | Key Focus & Characteristics |
 | :--- | :--- | :--- | :--- |
 | **🦞 OpenClaw** | Termux (Native) | Node.js (Standalone) | Local-first personal AI assistant gateway connecting chats (WhatsApp, Telegram, etc.) directly to AI models. |
-| **⚕ Hermes** | PRoot (Ubuntu) | Python/Venv + Node.js | Persistent, self-improving AI agent that saves workflows as reusable "skills" and learns over time. |
+| **⚕ Hermes (Native)** | Termux (Native) | Python/Venv + Node.js | Lightweight native Termux version of the persistent self-learning agent (runs directly on device CPU). |
+| **⚕ Hermes (PRoot)** | PRoot (Ubuntu) | Python/Venv + Node.js | Virtualized Ubuntu version of Hermes solving native Bionic libc compilation and browser control socket errors. |
 | **🧠 OpenClaude** | Termux (Native) | Vanilla Shell Script | Lightweight, autonomous terminal coder and assistant running natively without container overhead. |
 
 ---
@@ -40,13 +41,26 @@ curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/open
 
 ---
 
-## ⚕ 2. Hermes Agent (PRoot Ubuntu)
+## ⚕ 2. Hermes Agent (Dual Methods)
 
-Hermes is a persistent agent that creates its own skills. It uses an Ubuntu container via `proot-distro` to ensure compatibility with Python libraries (`psutil`) and Playwright browser control.
+Hermes is a persistent agent that creates its own skills. You can install it natively or inside a virtualized Ubuntu container depending on your compatibility requirements.
 
-### 🚀 Installation
+### 🚀 Installation (Interactive Selector)
+You can run the interactive selector to choose between Native and PRoot methods on the fly:
 ```bash
 curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/hermes_install.sh | bash
+```
+
+### 🏎️ Method 1: Native Installation (Direct)
+Use this command to install directly into native Termux (lightweight, uses fewer resources):
+```bash
+curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/hermes_install_native.sh | bash
+```
+
+### 🐳 Method 2: PRoot Ubuntu Installation (Direct)
+Use this command to install inside a virtualized Ubuntu glibc container (resolves SQLite compilation and Playwright browser control dependencies):
+```bash
+curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/hermes_install_proot.sh | bash
 ```
 
 ### ⚙️ Quick Reference Commands
