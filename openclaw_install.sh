@@ -118,9 +118,30 @@ setup_android_permissions() {
 install_toolchains() {
     log_info "Installing Node.js LTS, compilers, and dependencies..."
     
+    # Clear shell hash cache
+    if [ -n "${BASH_VERSION:-}" ]; then
+        hash -r
+    elif [ -n "${ZSH_VERSION:-}" ]; then
+        rehash
+    fi
+
+    log_info "Checking Node.js & NPM..."
+    local needs_node=true
+    if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
+        local node_ver
+        node_ver=$(node -v | tr -d 'v')
+        local major_ver
+        major_ver=$(echo "$node_ver" | cut -d'.' -f1)
+        if [ "$major_ver" -ge 22 ]; then
+            log_success "Compatible Node.js ($node_ver) and NPM already installed."
+            needs_node=false
+        else
+            log_warn "Installed Node.js ($node_ver) is older than recommended (v22+). Will attempt upgrade."
+        fi
+    fi
+
     # Native compilation chain is required in case OpenClaw compiles C++ native addons (node-gyp, sqlite, etc.)
     local deps=(
-        nodejs-lts
         git
         clang
         make
@@ -132,27 +153,46 @@ install_toolchains() {
         ffmpeg
     )
 
-    log_info "Installing packages: ${deps[*]}"
-    
+    log_info "Installing compiler toolchains & utilities: ${deps[*]}"
     if pkg install -y "${deps[@]}"; then
-        log_success "All compiler toolchains and node runtimes installed successfully."
+        log_success "System utilities and compiler toolchains installed."
     else
-        log_error "Failed to install some system dependencies."
-        log_warn "Retrying dependency installation individually..."
+        log_warn "Failed to install all packages in one run. Retrying individually..."
         for pkg in "${deps[@]}"; do
-            pkg install -y "$pkg" || log_warn "Failed to install optional dependency: $pkg"
+            pkg install -y "$pkg" || log_warn "Failed to install dependency: $pkg"
         done
     fi
-    
-    # Check Node.js and NPM versions
+
+    # Install/Upgrade Node.js if needed
+    if [ "$needs_node" = true ]; then
+        log_info "Installing Node.js..."
+        # Try 'nodejs' first, if that fails try 'nodejs-lts'
+        if pkg install -y nodejs; then
+            log_success "Node.js package installed."
+        elif pkg install -y nodejs-lts; then
+            log_success "Node.js LTS package installed."
+        else
+            log_error "Could not install Node.js package. Aborting."
+            exit 1
+        fi
+    fi
+
+    # Clear shell hash cache again to recognize newly installed node/npm
+    if [ -n "${BASH_VERSION:-}" ]; then
+        hash -r
+    elif [ -n "${ZSH_VERSION:-}" ]; then
+        rehash
+    fi
+
+    # Final verification check
     if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
         local node_version
         node_version=$(node -v)
         local npm_version
         npm_version=$(npm -v)
-        log_success "Node.js $node_version and NPM $npm_version verified."
+        log_success "Node.js $node_version and NPM $npm_version successfully verified."
     else
-        log_error "Node.js or NPM was not installed correctly. Aborting install."
+        log_error "Node.js or NPM was not installed correctly or is not accessible on PATH. Aborting install."
         exit 1
     fi
 }
