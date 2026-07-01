@@ -80,12 +80,13 @@ optimize_repositories() {
 
     if ! pkg update -y; then
         log_warn "Standard package index update failed."
-        log_info "Attempting mirror recovery using default main mirror..."
+        log_info "Attempting mirror recovery..."
         termux-change-repo || true
-        pkg update -y || {
-            log_error "Could not update packages. Please check your internet connection."
+        if ! pkg update -y; then
+            log_error "Could not update packages. This frequently happens if using the deprecated Google Play Store version of Termux."
+            log_error "Please download the official up-to-date Termux from F-Droid (https://f-droid.org/packages/com.termux/)."
             exit 1
-        }
+        fi
     fi
     log_success "Package repositories updated successfully."
 }
@@ -173,6 +174,22 @@ install_toolchains() {
             log_success "Node.js LTS package installed."
         else
             log_error "Could not install Node.js package. Aborting."
+            log_warn "========================================================"
+            log_warn "⚠️  CRITICAL ERROR: Failed to install Node.js via pkg."
+            log_warn "========================================================"
+            log_warn "This usually occurs due to one of the following:"
+            log_warn ""
+            log_warn "1. Obsolete Termux App (Google Play Store version):"
+            log_warn "   The version of Termux on the Play Store is deprecated and cannot connect"
+            log_warn "   to modern package repositories."
+            log_warn "   FIX: Uninstall it and install the official F-Droid version:"
+            log_warn "   👉 https://f-droid.org/packages/com.termux/"
+            log_warn ""
+            log_warn "2. Broken or Out-of-Sync Package Mirrors:"
+            log_warn "   Termux mirrors frequently go out of sync or offline."
+            log_warn "   FIX: Run 'termux-change-repo' manually, select a mirror (e.g. CF"
+            log_warn "   or Grimler), then run 'pkg update && pkg install -y nodejs'."
+            log_warn "========================================================"
             exit 1
         fi
     fi
