@@ -1,48 +1,48 @@
-# All-Agents Termux Installers
+# 🤖 Termux AI Agent Suite
 
-This repository contains professional environment preparers and installers to run top-tier autonomous AI agents on Android using **Termux**.
-
-It provides installation wrapper scripts for:
-1. **[Hermes Agent](https://github.com/NousResearch/hermes-agent)** (Ubuntu PRoot method) — solves Bionic libc compilation errors by running inside a standard Ubuntu environment.
-2. **[OpenClaw Agent](https://github.com/openclaw/openclaw)** (Native Termux method) — runs directly on the device using Node.js LTS and compiler toolchains.
+A collection of optimized, professional installer scripts to run state-of-the-art autonomous AI agents natively or virtualized on Android devices using **Termux**.
 
 ---
 
-## 🦞 1. OpenClaw Installer (Native Termux)
+## 📊 Agent Comparison Matrix
 
-**OpenClaw** is a local-first personal AI assistant gateway that connects messaging apps (WhatsApp, Telegram, Discord, etc.) to AI models. It runs natively in Termux using Node.js.
+| Agent | Environment | Installation Type | Quick Install Command |
+| :--- | :--- | :--- | :--- |
+| **🦞 OpenClaw** | Termux (Native) | Node.js (Standalone) | `curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/openclaw_install.sh \| bash` |
+| **⚕ Hermes** | PRoot (Ubuntu) | Python/Venv + Node.js | `curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/hermes_install.sh \| bash` |
+| **🧠 OpenClaude** | Termux (Native) | Vanilla Shell Script | `curl -sL "https://raw.githubusercontent.com/AbuZar-Ansarii/free-openclaude/master/vanila_install.sh" \| bash` |
 
-### 🚀 One-Line Installation
+---
 
-Open the **Termux** app on your Android device and run:
+## 🦞 1. OpenClaw Agent (Native Termux)
 
+**OpenClaw** is a local-first personal AI assistant gateway that connects multiple messaging interfaces (WhatsApp, Telegram, Discord, etc.) directly to your AI models.
+
+### 🚀 Installation
 ```bash
 curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/openclaw_install.sh | bash
 ```
 
-### 🎮 How to Control OpenClaw
-Once installed, the following commands are configured directly in your Termux shell:
-*   `openclaw onboard` (or `openclaw-setup`) — Run the interactive wizard to set up LLM providers (Gemini, OpenAI, etc.) and messaging credentials.
-*   `openclaw gateway` (or `openclaw-start`) — Run the background messaging connector.
-*   `openclaw doctor` (or `openclaw-doctor`) — Runs verification and diagnostics check.
-*   **Web Dashboard:** Accessible on your device at `http://127.0.0.1:18789` once the gateway is running.
+### ⚙️ Command Directory
+Run these commands directly in your Termux command line:
+*   `openclaw onboard` — Start the interactive model configuration setup.
+*   `openclaw gateway` — Boot up the background chat connectors.
+*   `openclaw doctor` — Run diagnostics to check configs and credentials.
+*   **Web Console:** Accessible at `http://127.0.0.1:18789` once the gateway is active.
 
 ---
 
-## ⚕ 2. Hermes Agent Installer (Ubuntu PRoot)
+## ⚕ 2. Hermes Agent (PRoot Ubuntu)
 
-**Hermes Agent** is a persistent, self-improving AI agent developed by Nous Research. Because of Bionic libc incompatibilities and Playwright Chromium requirements, it is installed inside a standard Ubuntu environment virtualized via `proot-distro`.
+**Hermes** is a persistent, self-improving AI agent developed by Nous Research. Because of Python wheel compilation requirements and Playwright Chromium control interfaces on Android, it runs inside an Ubuntu container via `proot-distro` for maximum compatibility.
 
-### 🚀 One-Line Installation
-
-Open the **Termux** app on your Android device and run:
-
+### 🚀 Installation
 ```bash
 curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/hermes_install.sh | bash
 ```
 
-### 🎮 How to Control Hermes
-Commands run transparently inside the Ubuntu container:
+### ⚙️ Command Directory
+The installer adds wrapper binaries to Termux so you can execute these transparently:
 *   `hermes-setup` — Run the model config setup wizard.
 *   `hermes-start` — Open the terminal console interface (TUI).
 *   `hermes-gateway` — Run the messaging bot connector.
@@ -50,24 +50,35 @@ Commands run transparently inside the Ubuntu container:
 
 ---
 
-## 🔋 Crucial Settings for Background Execution
+## 🧠 3. OpenClaude Agent (Native / Vanilla)
 
-Android's battery manager will kill background services like Termux. To ensure your AI agents stay online:
+**OpenClaude** is an autonomous terminal agent workspace designed to interact natively with your environment using optimized vanilla shell installers.
 
-1. **Acquire Wake Lock:** Both installers automatically invoke `termux-wake-lock`. Make sure a persistent Termux notification remains in your status drawer.
-2. **Battery Optimization:**
-   - Go to Android **Settings** -> **Apps** -> **Termux**.
+### 🚀 Installation
+```bash
+curl -sL "https://raw.githubusercontent.com/AbuZar-Ansarii/free-openclaude/master/vanila_install.sh" | bash
+```
+
+---
+
+## 🔋 Crucial Background Execution Guard
+
+Android OS aggressively stops background apps like Termux to preserve battery. To prevent your AI gateways from going offline:
+
+1. **Enable Wake Lock:** Keep the CPU awake. The installers run `termux-wake-lock` automatically. Ensure you keep the Termux background notification active in your notification drawer.
+2. **Disable Battery Optimization:**
+   - Go to your Android **Settings** -> **Apps** -> **Termux**.
    - Tap **Battery** or **Battery Saver**.
-   - Set to **Unrestricted** / **No restrictions**.
+   - Change the setting to **Unrestricted** (or turn off battery optimization).
 
 ---
 
 ## ⚙️ Push Updates to GitHub
 
-To sync these scripts and documentation with your remote repository, run:
+To sync changes made on your workstation back to your remote repository, run:
 
 ```bash
 git add openclaw_install.sh hermes_install.sh README.md
-git commit -m "Add OpenClaw native Termux installer and update unified README"
+git commit -m "Update and refine installer suite README"
 git push origin main
 ```
