@@ -10,6 +10,7 @@ YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
 PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
+WHITE='\033[1;37m'
 BOLD='\033[1m'
 NC='\033[0m' # No Color
 
@@ -53,8 +54,11 @@ print_success "Claude Code installed successfully."
 echo -e "\n${BOLD}${YELLOW}--------------------------------------------------${NC}"
 echo -e "${BOLD}${BLUE}👉 Please enter or paste your ANTHROPIC_API_KEY:${NC}"
 echo -e "${BOLD}${YELLOW}--------------------------------------------------${NC}"
-echo -n -e "${BOLD}${PURPLE}Key: ${NC}"
+
+# FIXED LINE 50: Combined flags properly into -ne
+echo -ne "${BOLD}${PURPLE}Key: ${NC}"
 read -r USER_API_KEY
+
 echo -e "${BOLD}${YELLOW}--------------------------------------------------${NC}\n"
 
 # Validate that the user didn't just press enter
