@@ -12,6 +12,8 @@ A collection of optimized, professional installer configurations to run state-of
 | **⚕ Hermes (Native)** | Termux (Native) | Python/Venv + Node.js | Lightweight native Termux version of the persistent self-learning agent (runs directly on device CPU). |
 | **⚕ Hermes (PRoot)** | PRoot (Ubuntu) | Python/Venv + Node.js | Virtualized Ubuntu version of Hermes solving native Bionic libc compilation and browser control socket errors. |
 | **🧠 OpenClaude** | Termux (Native) | Vanilla Shell Script | Lightweight, autonomous terminal coder and assistant running natively without container overhead. |
+| **🧠 Claude Code** | Termux (Native) | Node.js (Global) | Anthropic's official CLI agent running natively on Termux with custom API Base URL and Model parameters. |
+
 
 ---
 
@@ -88,6 +90,18 @@ curl -sL "https://raw.githubusercontent.com/AbuZar-Ansarii/free-openclaude/maste
 ```
 
 ---
+
+## 🧠 4. Claude Code Agent (Native / Node)
+
+Claude Code is Anthropic's agentic CLI tool, running natively in Termux and customized for custom endpoint providers.
+
+### 🚀 Installation
+```bash
+curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/claude_code_install.sh | bash
+```
+
+---
+
 
 ## 🔋 Android Background Optimization
 
