@@ -68,7 +68,17 @@ curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/herm
 
 ---
 
-## 🧠 3. OpenClaude Agent (Native / Vanilla)
+## 🧠 3. ClaudeCode Agent
+
+ClaudeCode is an autonomous developer workspace running natively on your phone via vanilla shell installations.
+
+### 🚀 Installation
+```bash
+curl -sL "https://raw.githubusercontent.com/AbuZar-Ansarii/free-openclaude/master/claude_install.sh" | bash
+```
+
+
+## 🧠 4. OpenClaude Agent (Native / Vanilla)
 
 OpenClaude is an autonomous developer workspace running natively on your phone via vanilla shell installations.
 
