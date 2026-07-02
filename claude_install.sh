@@ -1,190 +1,270 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# ============================================================================
+# Claude Code - Termux Native Installer
+# ============================================================================
+# Automates the setup of Anthropic's Claude Code CLI tool on Android/Termux,
+# installs nodejs and git, configures custom settings with custom API Base
+# URL and model, and sets up transparent shell environment settings.
+#
+# GitHub One-Liner Usage (once pushed to your repository):
+#   curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/claude_install.sh | bash
+# ============================================================================
 
-# Exit immediately if a command exits with a non-zero status
-set -e
+set -euo pipefail
 
-# --- Color Definitions ---
+# Style Definitions (Colors and Formatting)
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
-PURPLE='\033[0;35m'
+MAGENTA='\033[0;35m'
 CYAN='\033[0;36m'
-WHITE='\033[1;37m'
+NC='\033[0m' # No Color
 BOLD='\033[1m'
-DIM='\033[2m'
-NC='\033[0m'
 
-# --- UI Helper Functions ---
+# Logger Helper Functions
+log_info() {
+    echo -e "${CYAN}[INFO]${NC} $1"
+}
+
+log_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+log_warn() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+log_error() {
+    echo -e "${RED}[ERROR]${NC} $1" >&2
+}
+
 print_header() {
-    echo -e "\n${BOLD}${CYAN}╔══════════════════════════════════════════════════╗${NC}"
-    echo -e "${BOLD}${CYAN}║${NC} ${BOLD}${WHITE}  $1${NC}"
-    echo -e "${BOLD}${CYAN}╚══════════════════════════════════════════════════╝${NC}\n"
+    clear
+    echo -e "${CYAN}${BOLD}"
+    echo "┌────────────────────────────────────────────────────────┐"
+    echo "│         🧠 Claude Code Termux Native Installer         │"
+    echo "├────────────────────────────────────────────────────────┤"
+    echo "│  Installs Anthropic's Claude Code CLI tool natively   │"
+    echo "│  on Android/Termux with a custom API/Model provider.   │"
+    echo "└────────────────────────────────────────────────────────┘"
+    echo -e "${NC}"
 }
 
-print_status() {
-    echo -e "${BOLD}${BLUE}➜${NC} ${BOLD}$1${NC}"
+# 1. Environment Verification
+verify_termux() {
+    log_info "Verifying execution environment..."
+    if [ -n "${TERMUX_VERSION:-}" ] || [[ "${PREFIX:-}" == *"com.termux/files/usr"* ]]; then
+        log_success "Termux environment verified (Version: ${TERMUX_VERSION:-Unknown})."
+    else
+        log_warn "Non-standard Termux environment detected. Proceeding anyway..."
+    fi
 }
 
-print_success() {
-    echo -e "${BOLD}${GREEN}✓${NC} ${GREEN}$1${NC}"
+# 2. Termux Package Repositories Optimization & Non-interactive update
+optimize_and_update_repos() {
+    log_info "Updating Termux package repositories..."
+    
+    # Configure non-interactive options to prevent dpkg prompt blocks (answering N/O/confold automatically)
+    export DEBIAN_FRONTEND=noninteractive
+    
+    # Update repository index
+    if ! pkg update -y; then
+        log_warn "Standard package index update failed."
+        log_info "Attempting mirror recovery using default main mirror..."
+        termux-change-repo || true
+        pkg update -y || {
+            log_error "Could not update packages. Please check your internet connection."
+            exit 1
+        }
+    fi
+
+    # Perform package upgrade with auto-answer settings (noninteractive + confold to keep config files intact)
+    log_info "Upgrading system packages (auto-responding to maintain defaults)..."
+    if apt-get upgrade -y -o Dpkg::Options::="--force-confold" -o Dpkg::Options::="--force-confdef"; then
+        log_success "Package repository and system upgrades finished."
+    else
+        log_warn "Apt upgrade encountered minor issues, retrying with force options..."
+        apt-get upgrade -y --force-yes -o Dpkg::Options::="--force-confold" || log_warn "Upgrade returned non-zero code but continuing..."
+    fi
 }
 
-print_error() {
-    echo -e "${BOLD}${RED}✗${NC} ${RED}$1${NC}"
+# 3. Setup Android storage and background wake-lock
+setup_android_integration() {
+    log_info "Configuring storage access and wake locks..."
+    
+    # Storage setup
+    if [ ! -d "$HOME/storage" ]; then
+        log_info "Requesting Android Shared Storage access..."
+        log_info "Please approve the storage permission prompt on your screen."
+        termux-setup-storage || true
+    fi
+
+    # Wake lock setup
+    if command -v termux-wake-lock >/dev/null 2>&1; then
+        termux-wake-lock
+        log_success "Termux Wake-Lock enabled (prevents Android from killing background services)."
+    fi
 }
 
-print_info() {
-    echo -e "${DIM}  $1${NC}"
+# 4. Install Toolchains
+install_dependencies() {
+    log_info "Installing package dependencies (git, nodejs, npm)..."
+    
+    local deps=(
+        git
+        nodejs
+        npm
+    )
+
+    if pkg install -y "${deps[@]}"; then
+        log_success "Dependencies installed successfully: ${deps[*]}"
+    else
+        log_error "Failed to install dependencies via pkg."
+        log_info "Attempting installation via apt-get directly..."
+        apt-get install -y "${deps[@]}" || {
+            log_error "Could not install required packages. Please install git, nodejs, and npm manually."
+            exit 1
+        }
+    fi
 }
 
-print_divider() {
-    echo -e "${DIM}────────────────────────────────────────────────────────${NC}"
-}
-
-spinner() {
-    local pid=$1
-    local delay=0.1
-    local spinstr='|/-\'
-    while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
-        local temp=${spinstr#?}
-        printf " [%c]  " "$spinstr"
-        local spinstr=$temp${spinstr%"$temp"}
-        sleep $delay
-        printf "\b\b\b\b\b\b"
-    done
-    printf "    \b\b\b\b"
-}
-
-# --- Start Script ---
-clear
-
-print_header "   CLAUDE CODE INSTALLER FOR TERMUX"
-
-# Check if running in Termux
-if [ -z "$PREFIX" ] || [ ! -d "$PREFIX" ]; then
-    print_error "This script is designed to run in Termux only."
-    exit 1
-fi
-
-print_info "Termux environment detected ✓"
-print_info "User: $(whoami)"
-print_info "Date: $(date '+%Y-%m-%d %H:%M:%S')"
-print_divider
-
-# Step 1: Update System
-echo ""
-print_status "Updating package repositories and core packages..."
-{
-    pkg update -y 2>/dev/null
-    pkg upgrade -y 2>/dev/null
-} &
-spinner $!
-wait
-print_success "System update completed."
-
-# Step 2: Install Dependencies
-print_status "Installing required dependencies (git, nodejs)..."
-{
-    pkg install git nodejs -y 2>/dev/null
-} &
-spinner $!
-wait
-print_success "Dependencies successfully installed."
-
-# Check if installation was successful
-if ! command -v node &> /dev/null; then
-    print_error "Node.js installation failed. Please try again."
-    exit 1
-fi
-print_info "Node version: $(node --version)"
-print_info "NPM version: $(npm --version)"
-
-# Step 3: Install Claude Code
-print_status "Installing Claude Code (This may take a moment)..."
-{
-    yes | npm install -g @anthropic-ai/claude-code@2.1.112 2>/dev/null
-} &
-spinner $!
-wait
-
-if ! command -v claude &> /dev/null; then
-    print_error "Claude Code installation failed. Please try again."
-    exit 1
-fi
-print_success "Claude Code installed successfully."
-print_info "Version: $(claude --version 2>/dev/null || echo 'v2.1.112')"
-
-# Step 4: API Key Input
-echo ""
-print_divider
-echo -e "${BOLD}${BLUE}🔑${NC} ${BOLD}Please enter your Anthropic API Key:${NC}"
-echo -e "${DIM}  (You can find it at: https://console.anthropic.com/settings/keys)${NC}"
-print_divider
-echo -ne "${BOLD}${PURPLE}➜${NC} ${BOLD}API Key:${NC} "
-read -r USER_API_KEY
-
-if [ -z "$USER_API_KEY" ]; then
+# 5. Get API Key from User
+retrieve_api_key() {
+    echo -e "\n${CYAN}${BOLD}🔑 API Key Configuration:${NC}"
+    echo -e "You are using a custom endpoint provider (https://opencode.ai/zen)."
+    echo -e "Please enter your API key to configure the agent automatically."
+    echo -e "Press Enter to skip and configure the API key manually later."
     echo ""
-    print_error "API Key cannot be empty. Exiting installer."
-    exit 1
-fi
+    
+    local user_key=""
+    if [ -t 0 ] || [ -r /dev/tty ]; then
+        echo -ne "${YELLOW}${BOLD}Enter API Key:${NC} "
+        read -r user_key < /dev/tty || user_key=""
+    else
+        echo -ne "${YELLOW}${BOLD}Enter API Key:${NC} "
+        read -r user_key || user_key=""
+    fi
+    
+    # Clean input
+    user_key=$(echo "$user_key" | xargs)
 
-# Step 5: Configure Claude
-print_status "Creating configuration file..."
-mkdir -p ~/.claude
+    if [ -z "$user_key" ]; then
+        log_warn "No API Key provided. Will use standard placeholder 'YOUR_API_KEY_HERE'."
+        api_key="YOUR_API_KEY_HERE"
+    else
+        log_success "API Key received."
+        api_key="$user_key"
+    fi
+}
 
-# Create backup of existing config if it exists
-if [ -f ~/.claude/settings.json ]; then
-    print_info "Existing config found, creating backup..."
-    cp ~/.claude/settings.json ~/.claude/settings.json.bak
-fi
+# 6. Install Claude Code CLI
+install_claude_code() {
+    log_info "Installing @anthropic-ai/claude-code@2.1.112 globally via npm..."
+    
+    # Clean cache and install globally
+    if npm install -g @anthropic-ai/claude-code@2.1.112; then
+        log_success "Claude Code version 2.1.112 has been installed successfully."
+    else
+        log_error "Global npm install failed."
+        log_info "Retrying with sudo-like permissions check or prefix flag..."
+        npm install -g --unsafe-perm @anthropic-ai/claude-code@2.1.112 || {
+            log_error "Claude Code installation failed. Please check node/npm versions and retry."
+            exit 1
+        }
+    fi
+}
 
-cat <<EOF > ~/.claude/settings.json
+# 7. Configure Claude Settings
+configure_settings() {
+    log_info "Writing settings config to ~/.claude/settings.json..."
+    
+    mkdir -p "$HOME/.claude"
+    
+    cat <<EOF > "$HOME/.claude/settings.json"
 {
   "env": {
     "ANTHROPIC_BASE_URL": "https://opencode.ai/zen",
     "ANTHROPIC_MODEL": "deepseek-v4-flash-free",
-    "ANTHROPIC_API_KEY": "$USER_API_KEY",
+    "ANTHROPIC_API_KEY": "${api_key}",
     "ENABLE_TOOL_SEARCH": "true"
   },
   "autoUpdatesChannel": "latest"
 }
 EOF
 
-# Verify file creation
-if [ -f ~/.claude/settings.json ]; then
-    print_success "Configuration saved successfully at ~/.claude/settings.json"
-else
-    print_error "Failed to create configuration file."
-    exit 1
-fi
+    log_success "Settings file written successfully to $HOME/.claude/settings.json"
+}
 
-# Step 6: Test Configuration
-print_status "Testing configuration..."
-sleep 1
-print_success "Configuration verified."
+# 8. Configure Shell Aliases
+configure_shell() {
+    log_info "Configuring shell shortcuts and conveniences..."
+    
+    local shell_rc=""
+    local login_shell
+    login_shell=$(basename "${SHELL:-/bin/bash}")
+    
+    case "$login_shell" in
+        zsh)  shell_rc="$HOME/.zshrc" ;;
+        bash) shell_rc="$HOME/.bashrc" ;;
+        *)    shell_rc="$HOME/.bashrc" ;;
+    esac
 
-# --- Completion ---
-echo ""
-print_divider
-echo -e "${BOLD}${GREEN}╔══════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}${GREEN}║${NC} ${BOLD}${WHITE}🎉 SETUP COMPLETED SUCCESSFULLY! 🎉${NC}"
-echo -e "${BOLD}${GREEN}╚══════════════════════════════════════════════════╝${NC}"
-echo ""
-echo -e "${BOLD}${BLUE}📋${NC} ${BOLD}Quick Start:${NC}"
-echo -e "  ${DIM}▶${NC} Run ${BOLD}${CYAN}claude${NC} to start the interactive session"
-echo -e "  ${DIM}▶${NC} Type ${BOLD}${CYAN}/help${NC} for available commands"
-echo -e "  ${DIM}▶${NC} Press ${BOLD}${CYAN}Ctrl+C${NC} to exit"
-echo ""
-echo -e "${BOLD}${BLUE}📁${NC} ${BOLD}Configuration:${NC}"
-echo -e "  ${DIM}•${NC} Settings: ~/.claude/settings.json"
-echo -e "  ${DIM}•${NC} Backup: ~/.claude/settings.json.bak (if existed)"
-echo ""
-echo -e "${BOLD}${BLUE}🔧${NC} ${BOLD}Troubleshooting:${NC}"
-echo -e "  ${DIM}•${NC} If claude command not found, restart your terminal"
-echo -e "  ${DIM}•${NC} For issues, visit: https://docs.anthropic.com/claude-code"
-echo ""
-print_divider
-echo -e "${BOLD}${GREEN}Happy coding with Claude! 🚀${NC}"
-echo ""
+    # Ensure RC file exists
+    touch "$shell_rc"
+
+    # Define custom convenience aliases
+    local alias_claude="alias claude-code='claude'"
+    
+    # Check and append alias
+    if ! grep -qF "$alias_claude" "$shell_rc"; then
+        echo "" >> "$shell_rc"
+        echo "# Claude Code Custom Alias" >> "$shell_rc"
+        echo "$alias_claude" >> "$shell_rc"
+        log_success "Convenience alias 'claude-code' added to $shell_rc."
+    else
+        log_info "Alias 'claude-code' already exists in $shell_rc."
+    fi
+}
+
+# 9. Print Installation Success & Summary
+show_final_summary() {
+    print_header
+    echo -e "${GREEN}${BOLD}✓ Claude Code is successfully installed and configured!${NC}"
+    echo ""
+    echo -e "${CYAN}${BOLD}📱 Termux Quick Commands:${NC}"
+    echo -e "  - ${YELLOW}claude${NC}      : Launch the Claude Code CLI tool."
+    echo -e "  - ${YELLOW}claude-code${NC} : Alias to launch the Claude Code tool."
+    echo ""
+    echo -e "${CYAN}${BOLD}📁 File Locations:${NC}"
+    echo -e "  - ${YELLOW}Config File:${NC}  $HOME/.claude/settings.json"
+    echo ""
+    echo -e "${CYAN}${BOLD}⚙️ Pre-configured Environment:${NC}"
+    echo -e "  - ${YELLOW}Base URL:${NC}    https://opencode.ai/zen"
+    echo -e "  - ${YELLOW}Model:${NC}       deepseek-v4-flash-free"
+    echo -e "  - ${YELLOW}API Key:${NC}     $(if [ "$api_key" = "YOUR_API_KEY_HERE" ]; then echo -e "${RED}Placeholder (Needs Configuration)${NC}"; else echo -e "${GREEN}Configured successfully${NC}"; fi)"
+    echo ""
+    echo -e "${CYAN}${BOLD}🔋 Android Background Optimization:${NC}"
+    echo "  Android will aggressively suspend Termux if it is in the background."
+    echo "  - Make sure Termux Wake Lock is acquired (check your notification bar)."
+    echo "  - Disable Battery Optimization for Termux in your Android Settings."
+    echo ""
+    echo -e "${MAGENTA}Setup complete! Run 'source ~/.bashrc' (or source ~/.zshrc) and type 'claude' to begin! 🧠${NC}"
+    echo ""
+}
+
+# Main Execution Flow
+main() {
+    print_header
+    verify_termux
+    optimize_and_update_repos
+    setup_android_integration
+    install_dependencies
+    retrieve_api_key
+    install_claude_code
+    configure_settings
+    configure_shell
+    show_final_summary
+}
+
+main "$@"
