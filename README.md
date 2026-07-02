@@ -74,7 +74,7 @@ ClaudeCode is an autonomous developer workspace running natively on your phone v
 
 ### 🚀 Installation
 ```bash
-curl -sL "https://raw.githubusercontent.com/AbuZar-Ansarii/free-openclaude/master/claude_install.sh" | bash
+curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/claude_install.sh | bash
 ```
 
 
