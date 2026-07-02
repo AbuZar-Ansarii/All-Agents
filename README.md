@@ -32,7 +32,7 @@ Before installing any agent, ensure your environment meets the following conditi
 *   **Official Termux App:** Do not use the deprecated version from the Google Play Store. You must install the modern build from [F-Droid](https://f-droid.org/packages/com.termux/) or the [Termux GitHub Releases](https://github.com/termux/termux-app).
 *   **Active Internet Connection:** Stable connection is required to fetch compiler tools, Node packages, or container images.
 *   **LLM API Keys:** You will need API credentials (e.g., Gemini, OpenRouter, Anthropic, or OpenAI keys) to authorize model requests during onboarding.
-*   **FREE API key** Visit the OpenCode OpenCodeZen Free API](https://opencode.ai/)
+*   **FREE API key** Visit the OpenCode [OpenCodeZen Free API]([https://github.com/termux/termux-app](https://opencode.ai/))
 ---
 
 ## 🦞 1. OpenClaw Agent (Ubuntu PRoot)
