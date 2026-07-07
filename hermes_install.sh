@@ -87,39 +87,45 @@ copy_shizuku_files() {
 # Attempt to copy if not already in bin
 if [ ! -f "$local_bin/rish" ] || [ ! -f "$local_bin/rish_shizuku.dex" ]; then
     if ! copy_shizuku_files; then
-        log_warn "Could not locate Shizuku 'rish' files automatically."
-        echo ""
-        echo -e "Please:"
-        echo -e "  1. Open the Shizuku app."
-        echo -e "  2. Tap ${BOLD}'Use Shizuku in terminal apps'${NC} -> ${BOLD}'Export files'${NC}."
-        echo -e "  3. Save the files to your device's Shizuku folder."
-        echo ""
-        while true; do
-            read -r -p "Press [Enter] once you have exported the files, or Ctrl+C to abort..."
-            if copy_shizuku_files; then
-                break
-            fi
-            log_warn "Still unable to find rish files in storage. Please export them first."
-        done
+        log_info "Shizuku files not found in storage. Hermes will install without phone control unless configured later."
     fi
 fi
 
 # 3. Verify Shizuku Service is Running
 log_info "Verifying Shizuku service status..."
-while true; do
-    # Run test command via rish
+shizuku_connected=0
+
+if command -v rish >/dev/null 2>&1; then
     if rish -c "true" >/dev/null 2>&1; then
-        log_success "Shizuku service verified and connected!"
-        break
+        shizuku_connected=1
     fi
-    log_warn "Shizuku service is not running or Termux is not authorized."
+fi
+
+if [ "$shizuku_connected" -eq 1 ]; then
+    echo -e "${GREEN}${BOLD}[SUCCESS] Shizuku is connected! Hermes will run with full phone control.${NC}"
     echo ""
-    echo -e "Please:"
-    echo -e "  1. Open the Shizuku app and start the service (via Wireless Debugging)."
-    echo -e "  2. Ensure Termux is authorized under Shizuku's authorized apps."
+else
+    echo -e "${YELLOW}${BOLD}┌────────────────────────────────────────────────────────┐"
+    echo -e "│              ⚠️  SHIZUKU NOT CONNECTED  ⚠️             │"
+    echo -e "├────────────────────────────────────────────────────────┤"
+    echo -e "│  Hermes requires Shizuku to control screen gestures,   │"
+    echo -e "│  clicks, and phone calls.                              │"
+    echo -e "│                                                        │"
+    echo -e "│  If you do not want to grant phone control to Hermes,  │"
+    echo -e "│  you can proceed with a standard installation.         │"
+    echo -e "└────────────────────────────────────────────────────────┘${NC}"
     echo ""
-    read -r -p "Press [Enter] to retry connection, or Ctrl+C to abort..."
-done
+    read -r -p "Do you want to proceed with the installation without phone control? [y/N]: " proceed_without
+    case "$proceed_without" in
+        [yY]|[yY][eE][sS])
+            log_info "Proceeding with standard installation (no phone control)..."
+            ;;
+        *)
+            log_error "Installation aborted. Please start Shizuku and run this command again."
+            exit 1
+            ;;
+    esac
+fi
 
 # 4. Forward to the PRoot Installer directly
 log_info "Launching the Ubuntu PRoot installer wrapper..."
