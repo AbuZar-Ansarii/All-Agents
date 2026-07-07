@@ -90,7 +90,7 @@ setup_termux_prereqs() {
 
     # Install PRoot-distro and basic utilities in Termux
     log_info "Installing PRoot-Distro and Termux integrations..."
-    pkg install -y proot-distro termux-api curl git
+    pkg install -y proot-distro termux-api curl git python
 }
 
 # 3. Setup Android storage and background wake-lock
@@ -328,14 +328,14 @@ chmod +x /usr/local/bin/phone-cmd"
 
 # Start Termux Host Bridge Server if not running
 if ! pgrep -f termux_bridge_server.py >/dev/null; then
-    python3 "\$HOME/termux_bridge_server.py" >/dev/null 2>&1 &
+    python "\$HOME/termux_bridge_server.py" >/dev/null 2>&1 &
     sleep 1.5
 fi
 
 if command -v termux-wake-lock >/dev/null 2>&1; then
     termux-wake-lock
 fi
-exec proot-distro login ubuntu --shared-tmp -- hermes "\$@"
+exec proot-distro login ubuntu --shared-tmp -- bash -lc 'exec hermes "\$@"'
 EOF
     chmod +x "$bin_dir/hermes"
 
