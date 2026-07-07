@@ -93,6 +93,26 @@ To prevent Android's battery manager from terminating your active agent processe
 
 ---
 
+## 🎮 Shizuku & Full Phone Control (Ubuntu PRoot)
+
+The Hermes agent (running inside Ubuntu PRoot) can completely control your phone (simulate taps, swipes, open apps, make calls, etc.) via **Shizuku**:
+
+### 🚀 Setup
+1. **Prepare Shizuku:**
+   - Install the **Shizuku** app on your phone.
+   - Start the Shizuku service via Wireless Debugging.
+   - In the Shizuku app, tap *Use Shizuku in terminal apps* > *Export files* and save the files to your device storage (Shizuku folder).
+2. **Run Installer:**
+   - Run the single-line Hermes installer (select Option 2: PRoot Ubuntu). The installer will automatically locate your exported Shizuku files, copy them, and configure the bridge.
+     ```bash
+     curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/hermes_install.sh | bash
+     ```
+3. **Device Control:**
+   - Simply run `hermes`. The phone control bridge starts automatically in the background.
+   - Hermes can now run phone-level commands (e.g. `phone-cmd input tap X Y` to simulate taps, `phone-cmd termux-telephony-call <number>` to make calls, or `phone-cmd termux-toast "Hello!"`).
+
+---
+
 ## 🛠️ Troubleshooting
 
 ### 1. Mirror Connection / Package Locating Errors

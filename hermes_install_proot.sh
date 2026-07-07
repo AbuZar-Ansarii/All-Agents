@@ -160,15 +160,178 @@ execute_hermes_inside_ubuntu() {
 
 # 7. Configure Transparent Launchers in Termux
 configure_termux_launchers() {
-    log_info "Setting up transparent launchers in Termux..."
+    log_info "Setting up transparent launchers and Shizuku bridge..."
     
     local bin_dir="$PREFIX/bin"
     mkdir -p "$bin_dir"
 
-    # Main hermes launcher
+    # 1. Setup Shizuku rish if present
+    log_info "Checking for Shizuku 'rish' files to enable phone control..."
+    local found_shizuku=0
+    local shizuku_src=""
+    local paths=(
+        "/sdcard/Shizuku"
+        "$HOME/storage/shared/Shizuku"
+        "/sdcard/Android/media/moe.shizuku.privileged.api"
+        "$HOME/storage/shared/Android/media/moe.shizuku.privileged.api"
+        "/sdcard/Android/media/moe.shizuku.privileged.api/files"
+        "$HOME/storage/shared/Android/media/moe.shizuku.privileged.api/files"
+    )
+    
+    for path in "${paths[@]}"; do
+        if [ -f "$path/rish" ] && [ -f "$path/rish_shizuku.dex" ]; then
+            shizuku_src="$path"
+            found_shizuku=1
+            break
+        fi
+    done
+
+    if [ "$found_shizuku" -eq 1 ]; then
+        log_success "Shizuku files detected in $shizuku_src. Setting up execution rights..."
+        cp "$shizuku_src/rish" "$bin_dir/rish"
+        cp "$shizuku_src/rish_shizuku.dex" "$bin_dir/rish_shizuku.dex"
+        chmod +x "$bin_dir/rish"
+        chmod 400 "$bin_dir/rish_shizuku.dex"
+    else
+        log_warn "Shizuku 'rish' files were not automatically found."
+        log_warn "To enable full screen control, please open the Shizuku app, tap 'Use Shizuku in terminal apps' -> 'Export files' and save them in the Shizuku folder on your phone storage."
+    fi
+
+    # 2. Write host bridge python server
+    local bridge_py="$HOME/termux_bridge_server.py"
+    log_info "Creating Termux host bridge server..."
+    cat > "$bridge_py" << 'EOF'
+import subprocess
+import sys
+from http.server import HTTPServer, BaseHTTPRequestHandler
+import json
+
+class CommandBridgeHandler(BaseHTTPRequestHandler):
+    def do_POST(self):
+        try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            post_data = self.rfile.read(content_length)
+            req = json.loads(post_data.decode('utf-8'))
+            command = req.get('command')
+            use_shizuku = req.get('shizuku', False)
+            
+            if not command:
+                response = {'status': 'error', 'error': 'No command provided'}
+            else:
+                if use_shizuku:
+                    escaped_command = command.replace("'", "'\\''")
+                    full_command = f"rish -c '{escaped_command}'"
+                else:
+                    full_command = command
+                
+                print(f"[BRIDGE] Executing: {full_command}")
+                
+                res = subprocess.run(
+                    full_command,
+                    shell=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                    timeout=60
+                )
+                
+                response = {
+                    'status': 'success',
+                    'returncode': res.returncode,
+                    'stdout': res.stdout,
+                    'stderr': res.stderr
+                }
+        except Exception as e:
+            response = {
+                'status': 'error',
+                'error': str(e)
+            }
+            
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        self.wfile.write(json.dumps(response).encode('utf-8'))
+
+def run(port=9999):
+    server_address = ('127.0.0.1', port)
+    httpd = HTTPServer(server_address, CommandBridgeHandler)
+    print(f"[BRIDGE] Server started on http://127.0.0.1:{port}")
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    print("[BRIDGE] Server stopped.")
+
+if __name__ == '__main__':
+    run()
+EOF
+
+    # 3. Inject client python tool to Ubuntu container
+    log_info "Injecting phone-cmd client utility into Ubuntu..."
+    proot-distro login ubuntu -- bash -c "cat > /usr/local/bin/phone-cmd << 'EOF'
+#!/usr/bin/env python3
+import sys
+import json
+import urllib.request
+import urllib.error
+
+def main():
+    if len(sys.argv) < 2:
+        print(\"Usage: phone-cmd <command>\")
+        sys.exit(1)
+        
+    cmd = \" \".join(sys.argv[1:])
+    
+    # Check if we should execute via shizuku rish or directly as Termux user
+    use_shizuku = any(x in cmd for x in [\"input \", \"am \", \"pm \", \"screencap\", \"settings \", \"dumpsys\"])
+    
+    payload = {
+        \"command\": cmd,
+        \"shizuku\": use_shizuku
+    }
+    
+    data = json.dumps(payload).encode('utf-8')
+    req = urllib.request.Request(
+        \"http://127.0.0.1:9999\",
+        data=data,
+        headers={\"Content-Type\": \"application/json\"},
+        method=\"POST\"
+    )
+    
+    try:
+        with urllib.request.urlopen(req, timeout=65) as response:
+            res = json.loads(response.read().decode('utf-8'))
+            if res.get('status') == 'success':
+                sys.stdout.write(res.get('stdout', ''))
+                sys.stderr.write(res.get('stderr', ''))
+                sys.exit(res.get('returncode', 0))
+            else:
+                print(f\"Bridge error: {res.get('error')}\", file=sys.stderr)
+                sys.exit(1)
+    except urllib.error.URLError as e:
+        print(f\"Error connecting to bridge server: {e.reason}\", file=sys.stderr)
+        print(\"Please ensure the Termux bridge server is running on the host.\", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f\"Unexpected error: {e}\", file=sys.stderr)
+        sys.exit(1)
+
+if __name__ == '__main__':
+    main()
+EOF
+chmod +x /usr/local/bin/phone-cmd"
+
+    # 4. Create transparent hermes launcher wrapper with autostart bridge
     cat > "$bin_dir/hermes" <<EOF
 #!/usr/bin/env bash
-# Hermes Termux wrapper
+# Hermes Termux wrapper with Auto-Start Shizuku Bridge
+
+# Start Termux Host Bridge Server if not running
+if ! pgrep -f termux_bridge_server.py >/dev/null; then
+    python3 "\$HOME/termux_bridge_server.py" >/dev/null 2>&1 &
+    sleep 1.5
+fi
+
 if command -v termux-wake-lock >/dev/null 2>&1; then
     termux-wake-lock
 fi
