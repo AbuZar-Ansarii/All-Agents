@@ -108,23 +108,16 @@ else
     echo -e "${YELLOW}${BOLD}┌────────────────────────────────────────────────────────┐"
     echo -e "│              ⚠️  SHIZUKU NOT CONNECTED  ⚠️             │"
     echo -e "├────────────────────────────────────────────────────────┤"
-    echo -e "│  Hermes requires Shizuku to control screen gestures,   │"
-    echo -e "│  clicks, and phone calls.                              │"
+    echo -e "│  Hermes can control screen gestures, clicks, and make  │"
+    echo -e "│  calls if you set up and run Shizuku.                  │"
     echo -e "│                                                        │"
-    echo -e "│  If you do not want to grant phone control to Hermes,  │"
-    echo -e "│  you can proceed with a standard installation.         │"
+    echo -e "│  To enable phone control later:                        │"
+    echo -e "│  1. Open Shizuku app & start the service.              │"
+    echo -e "│  2. Tap 'Use Shizuku in terminal apps' -> 'Export files'│"
+    echo -e "│     and save them in the Shizuku folder.               │"
     echo -e "└────────────────────────────────────────────────────────┘${NC}"
     echo ""
-    read -r -p "Do you want to proceed with the installation without phone control? [y/N]: " proceed_without
-    case "$proceed_without" in
-        [yY]|[yY][eE][sS])
-            log_info "Proceeding with standard installation (no phone control)..."
-            ;;
-        *)
-            log_error "Installation aborted. Please start Shizuku and run this command again."
-            exit 1
-            ;;
-    esac
+    log_info "Proceeding with installation..."
 fi
 
 # 4. Forward to the PRoot Installer directly
