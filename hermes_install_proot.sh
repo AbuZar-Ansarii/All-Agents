@@ -321,6 +321,33 @@ if __name__ == '__main__':
 EOF
 chmod +x /usr/local/bin/phone-cmd"
 
+    # Inject phone control instructions into Hermes SOUL.md
+    log_info "Injecting phone control instructions into Hermes Soul..."
+    proot-distro login ubuntu -- bash -c "
+        mkdir -p /root/.hermes
+        touch /root/.hermes/SOUL.md
+        if ! grep -q 'phone-cmd' /root/.hermes/SOUL.md; then
+            cat >> /root/.hermes/SOUL.md << 'EOF'
+
+# Phone Control Instructions
+You are running on a mobile device inside a Termux container.
+You have the ability to control this phone (simulate taps, scrolls, make phone calls, open apps, send SMS, read clipboard/location/battery, etc.) by running host shell commands through a bridge.
+
+To execute a command on the phone, run it using the 'phone-cmd' utility.
+For example:
+- Tap on screen at coordinates X=500, Y=1200: 'phone-cmd input tap 500 1200'
+- Swipe on screen: 'phone-cmd input swipe X1 Y1 X2 Y2 [duration]'
+- Send a keypress/back/home: 'phone-cmd input keyevent KEYCODE_BACK' or 'KEYCODE_HOME'
+- Make a phone call: 'phone-cmd termux-telephony-call <number>'
+- Show a popup alert: 'phone-cmd termux-toast \"message\"'
+- Text-to-speech speak aloud: 'phone-cmd termux-tts-speak \"message\"'
+- Open a web page / search results on YouTube: 'phone-cmd termux-open \"url\"'
+
+Whenever the user asks you to interact with the phone, play a song, click something, or make a call, use the 'phone-cmd' command.
+EOF
+        fi
+    "
+
     # 4. Create transparent hermes launcher wrapper with autostart bridge
     cat > "$bin_dir/hermes" <<EOF
 #!/usr/bin/env bash
