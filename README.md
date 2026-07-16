@@ -82,8 +82,20 @@ n8n is a node-based, open-source workflow automation platform
 
 ### Installation
 ```
-curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/n8n_install.sh | bash
+pkg install proot-distro
+proot-distro install ubuntu
+proot-distro login ubuntu
 ```
+```
+apt update && apt upgrade -y
+apt install curl sudo -y
+# Install Node.js (LTS)
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+apt install -y nodejs
+# Install n8n globally
+npm install n8n -g
+```
+
 ### Start n8n in termux
 ```
 start n8n
