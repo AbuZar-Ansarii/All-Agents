@@ -13,8 +13,6 @@ A collection of optimized, professional installer configurations to run state-of
 | **⚕ Hermes (PRoot)** | PRoot (Ubuntu) | Python/Venv + Node.js | Virtualized Ubuntu version of Hermes solving native Bionic libc compilation and browser control socket errors. |
 | **🧠 OpenClaude** | Termux (Native) | Vanilla Shell Script | Lightweight, autonomous terminal coder and assistant running natively without container overhead. |
 
-
-
 ---
 
 ## ✨ Suite Features
@@ -79,13 +77,18 @@ OpenClaude is an autonomous developer workspace running natively on your phone v
 curl -sL "https://raw.githubusercontent.com/AbuZar-Ansarii/free-openclaude/master/vanila_install.sh" | bash
 ```
 ---
-### 4. n8n 
+### 🪢 4. n8n 
 n8n is a node-based, open-source workflow automation platform
 
 ### Installation
 ```
 curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/n8n_install.sh | bash
 ```
+### Start n8n in termux
+```
+start n8n
+```
+
 ### Access n8n on PC
 Find your Phone's IP AddressInside your Termux/Ubuntu terminal, run this command:
 ```
@@ -93,7 +96,11 @@ hostname -I
 ```
 You will see a series of numbers like 192.168.1.15. This is your phone's address on your Wi-Fi network.
 
-Restart n8n for External AccessBy default, n8n often listens only to "localhost" (itself). To let your laptop talk to it, you need to tell n8n to listen to all network connections.Stop n8n if it's running (Ctrl + C).Restart it with these specific flags:
+1. Restart n8n for External AccessBy default, n8n often listens only to "localhost" (itself).
+2. To let your laptop talk to it, you need to tell n8n to listen to all network connections.
+3. Stop n8n if it's running *(Ctrl + C)*.Restart it with these specific flags:
+
+### Run Again
 ```
 export N8N_HOST=0.0.0.0
 export N8N_SECURE_COOKIE=false
