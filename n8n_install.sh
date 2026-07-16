@@ -1,12 +1,15 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-echo "🚀 Setting up Ubuntu environment in Termux..."
+# Prevent any interactive blocking screens
+export DEBIAN_FRONTEND=noninteractive
 
-# 1. Update Termux base using strict 'yes y' pipelining
+echo "🚀 Starting 100% automated n8n installation..."
+
+# 1. Update Termux base using direct dpkg force options to bypass Y/N prompts
 echo "🔄 Updating Termux repository..."
-yes y | pkg update -y
-yes y | pkg upgrade -y
-yes y | pkg install proot-distro curl -y
+pkg update -y -o Dpkg::Options::="--force-confnew" -o Dpkg::Options::="--force-confdef"
+pkg upgrade -y -o Dpkg::Options::="--force-confnew" -o Dpkg::Options::="--force-confdef"
+pkg install proot-distro curl -y -o Dpkg::Options::="--force-confnew" -o Dpkg::Options::="--force-confdef"
 
 # 2. Install Ubuntu container if it isn't already installed
 if [ ! -d "$PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu" ]; then
@@ -20,14 +23,14 @@ cat << 'EOF' > $PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu/root/setup_n
 #!/bin/bash
 export DEBIAN_FRONTEND=noninteractive
 
-# Update Ubuntu packages inside the container
-yes y | apt-get update
-yes y | apt-get upgrade -y
-yes y | apt-get install -y curl build-essential
+# Update Ubuntu packages inside the container with prompt forcing
+apt-get update
+apt-get upgrade -y -o Dpkg::Options::="--force-confnew" -o Dpkg::Options::="--force-confdef"
+apt-get install -y curl build-essential -o Dpkg::Options::="--force-confnew" -o Dpkg::Options::="--force-confdef"
 
 # Install Node.js 20 LTS
 curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-yes y | apt-get install -y nodejs
+apt-get install -y nodejs -o Dpkg::Options::="--force-confnew" -o Dpkg::Options::="--force-confdef"
 
 # Install n8n globally
 npm install -g n8n --omit=dev --yes
