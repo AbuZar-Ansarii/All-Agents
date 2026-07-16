@@ -102,15 +102,14 @@ start n8n
 ```
 
 ### Access n8n on PC
-Find your Phone's IP AddressInside your Termux/Ubuntu terminal, run this command:
+Stop n8n if it's running *(Ctrl + C)*.Restart it with these specific flags.
 ```
 hostname -I
 ```
-You will see a series of numbers like 192.168.1.15. This is your phone's address on your Wi-Fi network.
-
+Find your Phone's IP AddressInside your Termux/Ubuntu terminal, run this command:
+*You will see a series of numbers like 192.168.1.15. This is your phone's address on your Wi-Fi network.*
 1. Restart n8n for External AccessBy default, n8n often listens only to "localhost" (itself).
 2. To let your laptop talk to it, you need to tell n8n to listen to all network connections.
-3. Stop n8n if it's running *(Ctrl + C)*.Restart it with these specific flags:
 
 ### Run Again
 ```
