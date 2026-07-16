@@ -79,7 +79,27 @@ OpenClaude is an autonomous developer workspace running natively on your phone v
 curl -sL "https://raw.githubusercontent.com/AbuZar-Ansarii/free-openclaude/master/vanila_install.sh" | bash
 ```
 ---
+### 4. n8n 
+n8n is a node-based, open-source workflow automation platform
 
+### Installation
+```
+curl -fsSL https://raw.githubusercontent.com/AbuZar-Ansarii/All-Agents/main/n8n_install.sh | bash
+```
+### Access n8n on PC
+Find your Phone's IP AddressInside your Termux/Ubuntu terminal, run this command:
+```
+hostname -I
+```
+You will see a series of numbers like 192.168.1.15. This is your phone's address on your Wi-Fi network.
+
+Restart n8n for External AccessBy default, n8n often listens only to "localhost" (itself). To let your laptop talk to it, you need to tell n8n to listen to all network connections.Stop n8n if it's running (Ctrl + C).Restart it with these specific flags:
+```
+export N8N_HOST=0.0.0.0
+export N8N_SECURE_COOKIE=false
+n8n start
+```
+Note: N8N_SECURE_COOKIE=false is necessary because your laptop will likely connect via http instead of https. Without this, you might get "Login failed" errors.Step 3: Access from your LaptopEnsure your laptop and phone are on the same Wi-Fi.Open Chrome or any browser on your laptop.In the address bar, type your phone's IP and port 5678. For example:  http://192.168.1.15:5678
 
 ## 🔋 Android Background Optimization
 
